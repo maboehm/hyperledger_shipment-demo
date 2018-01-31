@@ -3,16 +3,77 @@
     <button ion-button menuToggle>
       <ion-icon name="menu"></ion-icon>
     </button>
-    <ion-title>Home</ion-title>
+    <ion-title>Shipment Status</ion-title>
+    <ion-buttons end>
+      <button ion-button icon-only *ngIf="shipmentData">
+        <ion-icon name="refresh"></ion-icon>
+      </button>
+    </ion-buttons>
   </ion-navbar>
 </ion-header>
 
 <ion-content padding>
-  <h3>Ionic Menu Starter</h3>
+  <ion-card>
+    <ion-card-content>
+      <h1>Shipment Details</h1>
+      <form>
+        <ion-list>
+          <ion-item>
+            <ion-label color="primary" floating>Shipment</ion-label>
+            <ion-input type="text" [(ngModel)]="shipmentId" [ngModelOptions]="{standalone: true}"></ion-input>
+          </ion-item>
+          <ion-item>
+            <button type="submit" item-end ion-button secondary outline (click)=onButtonClick() icon-start [disabled]="!shipmentId">
+              <ion-icon name="md-send"></ion-icon>
+              Check Shiptment Status
+            </button>
+          </ion-item>
+        </ion-list>
+      </form>
+    </ion-card-content>
+  </ion-card>
 
-  <p>
-    If you get lost, the <a href="http://ionicframework.com/docs/v2">docs</a> will show you the way.
-  </p>
 
-  <button ion-button secondary menuToggle>Toggle Menu</button>
+  <ion-card *ngIf="shipmentData">
+    <ion-card-header color="primary">
+      <ion-badge float-end color="secondary">{{shipmentData.status}}</ion-badge>
+      <h1>{{shipmentData.shipmentId}}</h1>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-list>
+        <ion-list-header color="light">
+          Info
+        </ion-list-header>
+        <button ion-item (click)="detailClick('Contract', shipmentData.contract.split('#')[1])">
+          <ion-icon name="document" item-start></ion-icon>
+          <h3>Vertrag</h3>
+          <p>{{shipmentData.contract}}</p>
+        </button>
+        <button ion-item (click)="detailClick('Insurer', shipmentData.insurer.split('#')[1])">
+          <ion-icon name="briefcase" item-start></ion-icon>
+          <h3>Versicherer</h3>
+          <p>{{shipmentData.insurer}}</p>
+        </button>
+        <button ion-item (click)="detailClick('Device', shipmentData.device.split('#')[1])">
+          <ion-icon name="phone-portrait" item-start></ion-icon>
+          <h3>Gerät</h3>
+          <p>{{shipmentData.device}}</p>
+        </button>
+
+        <div *ngIf="shipmentData.shipmentExceptions">
+          <ion-list-header color="danger">
+            <ion-icon name="warning" item-start></ion-icon>
+            Exceptions
+          </ion-list-header>
+          <button ion-item (click)="detailClick('ShipmentException', exception.transactionId)" *ngFor="let exception of shipmentData.shipmentExceptions"
+            [ngStyle]="{ 'background-color': exception.highlight ? 'silver': ''}">
+            <h3>{{exception.message}}</h3>
+            <p>
+              <ion-icon name="pin"></ion-icon> {{exception.gpsLat}}, {{exception.gpsLong}}</p>
+            <p item-end>{{exception.timestamp | date:'medium':'':'de-de'}}</p>
+          </button>
+        </div>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
 </ion-content>
