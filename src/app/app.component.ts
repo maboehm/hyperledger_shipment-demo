@@ -1,10 +1,15 @@
+import { HomePage } from './../pages/home/home';
+import { GlobalService } from './../providers/global/global';
+import { TransferPage } from './../pages/transfer/transfer';
+import { InfoPage } from './../pages/info/info';
 import { Component, ViewChild } from '@angular/core';
 import { Nav, Platform } from 'ionic-angular';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
+import { ApplicationRef } from '@angular/core';
 
-import { HomePage } from '../pages/home/home';
 import { ListPage } from '../pages/list/list';
+import { dispatchEvent } from '@angular/core/src/view/util';
 
 @Component({
   templateUrl: 'app.html'
@@ -12,19 +17,35 @@ import { ListPage } from '../pages/list/list';
 export class MyApp {
   @ViewChild(Nav) nav: Nav;
 
-  rootPage: any = HomePage;
+  rootPage: any = TransferPage;
 
-  pages: Array<{title: string, component: any}>;
+  pages: Array<{title: string, component: any, icon: string}>;
+  verifiedId = false;
+  myId : string;
 
-  constructor(public platform: Platform, public statusBar: StatusBar, public splashScreen: SplashScreen) {
-    this.initializeApp();
+  constructor(public platform: Platform, public statusBar: StatusBar, public splashScreen: SplashScreen,
+  public global: GlobalService, public ref: ApplicationRef) {
 
     // used for an example of ngFor and navigation
     this.pages = [
-      { title: 'Home', component: HomePage },
-      { title: 'List', component: ListPage }
+      { title: 'Shipment Status', component: HomePage, icon: "cube"},
+      { title: 'Transfer', component: TransferPage, icon: "share-alt"},
+      { title: 'Info', component: InfoPage, icon: "information-circle" }
     ];
 
+  }
+  private ionViewDidLoad() {
+   console.log("did load");
+  }
+
+  private menuOpened() {
+    console.log("menu opened");
+    this.myId = this.global.getId();
+    this.ref.tick();
+  }
+
+  private idChanged(event) {
+    this.global.setId(this.myId);
   }
 
   initializeApp() {

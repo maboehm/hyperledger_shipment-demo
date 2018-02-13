@@ -1,4 +1,4 @@
-<ion-menu type="push" [content]="content">
+<ion-menu [content]="content" (ionOpen)="menuOpened()">
   <ion-header>
     <ion-toolbar>
       <ion-title>Menu</ion-title>
@@ -6,8 +6,22 @@
   </ion-header>
 
   <ion-content>
+    <div *ngIf="!verifiedId">
+      <ion-item >
+          <ion-icon name="person" item-start></ion-icon>
+          <ion-label color="primary" floating>ID</ion-label>
+          <ion-input type="text" [(ngModel)]="myId" (ngModelChange)="idChanged($event)"></ion-input>
+      </ion-item>
+      <!--ion-item class="fileUpload">
+        <ion-icon name="person" item-start></ion-icon>
+        <button ion-button>Upload Card</button>
+        <input type="file" (change)="fileUpload($event)">
+      </ion-item-->
+      <hr style="background-color: blue;height: 2px;">
+    </div>
     <ion-list>
       <button menuClose ion-item *ngFor="let p of pages" (click)="openPage(p)">
+        <ion-icon name="{{p.icon}}" item-start></ion-icon>
         {{p.title}}
       </button>
     </ion-list>

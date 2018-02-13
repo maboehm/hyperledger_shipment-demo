@@ -1,10 +1,10 @@
+import { GlobalService } from './../../providers/global/global';
 import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
 import { WebsocketProvider } from '../../providers/websocket/websocket';
 import { Subscriber } from 'rxjs/Subscriber';
 import { ToastController } from 'ionic-angular';
 import { HttpClient } from "@angular/common/http";
-import {Storage} from "@ionic/storage";
 import { isArray } from 'ionic-angular/util/util';
 
 import { ListPage } from '../list/list';
@@ -18,34 +18,30 @@ export class HomePage {
   private url = "ws://kit-blockchain.duckdns.org:31090/"
   private shipmentData: any;
   private exceptionLength = 0;
-  private shipmentId: String;
+  private shipmentId: string;
 
   constructor(
     public navCtrl: NavController,
     public webSocket: WebsocketProvider,
     private toastCtrl: ToastController,
     private http: HttpClient,
-    private storage: Storage) {
-    
-      this.storage.get("shipmentId").then(v => {
-        console.log("storage", v);
-        this.shipmentId = v ? v : '';
-        this.onButtonClick();
-      })
+    private global: GlobalService) {
+
+    this.global.observeShipmentId().subscribe(next => this.shipmentId = next);
   }
 
-  private detailClick(type: String, id: String) {
+  private detailClick(type: string, id: string) {
     this.navCtrl.push(ListPage, {
       type: type,
       id: id
     });
   }
 
-  private presentToast(message, time, onDismiss?) {
+  private presentToast(message, time, onDismiss?, position?) {
     let toast = this.toastCtrl.create({
       message: message,
       duration: time,
-      position: 'bottom',
+      position: position ? position : 'bottom',
       showCloseButton: true,
       closeButtonText: "OK"
     });
@@ -57,18 +53,18 @@ export class HomePage {
 
   private onButtonClick() {
     console.log("button");
-    this.storage.set("shipmentId", this.shipmentId)
+    this.global.setShipmentId(this.shipmentId);
     this.presentToast("Lade Daten", 2000)
     this.updateChainData(this.shipmentId)
   }
 
-  private updateChainData(shipmentId: String) {
+  private updateChainData(shipmentId: string) {
     this.http.get("http://kit-blockchain.duckdns.org:31090/api/Shipment/" + shipmentId)
-      .subscribe((data : any) => {
+      .subscribe((data: any) => {
         console.log("Recieved data", data);
         data = isArray(data) ? data[0] : data;
 
-        if (data.shipmentExceptions) { 
+        if (data.shipmentExceptions) {
 
           data.shipmentExceptions.map(a => a.timestamp = new Date(a.timestamp))
           data.shipmentExceptions = data.shipmentExceptions.sort((a, b) => b.timestamp - a.timestamp)
@@ -82,9 +78,20 @@ export class HomePage {
         }
         this.shipmentData = data;
       },
-    error => {
-      this.shipmentData = null;
-    })
+      error => {
+        this.shipmentData = null;
+      })
+  }
+
+  private onShipmentException(data) {
+    if (data.shipmentId != this.shipmentId) return;
+
+    this.presentToast("A new Exception was committed to the Blockchain: '" + data.message + "'", 5000, () => {
+      if (this.shipmentData && this.shipmentData.shipmentExceptions) {
+        this.shipmentData.shipmentExceptions.map(a => a.highlight = false);
+      }
+    });
+    this.updateChainData(this.shipmentId);
   }
 
   private ionViewDidLoad() {
@@ -98,31 +105,13 @@ export class HomePage {
     observable.subscribe(
       next => {
         console.log("event", next);
-
-        if (next.shipmentId != this.shipmentId) return;
-
-        this.presentToast("A new Exception was committed to the Blockchain: '" + next.message + "'", 5000, () => {
-          if(this.shipmentData && this.shipmentData.shipmentExceptions) {
-            this.shipmentData.shipmentExceptions.map(a => a.highlight = false);
-          } 
-        });
-        this.updateChainData(this.shipmentId);
+        switch (next.$class) {
+          case "org.kit.blockchain.ShipmentExceptionEvent": this.onShipmentException(next);
+            break;
+          default: this.presentToast("New Event: " + next.$class, 3000, null, "top")
+        }
       },
       error => console.log(error)
     )
-
   }
-
-  private onOpen() {
-    console.info("web socket connection started");
-  }
-  private onClose() {
-    console.info("web sockeet closed");
-  }
-
-
-
-
-
-
 }
