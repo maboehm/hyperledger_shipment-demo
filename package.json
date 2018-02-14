@@ -1,9 +1,9 @@
 {
   "name": "kit-demo",
   "version": "0.0.1",
-  "author": "Ionic Framework",
-  "homepage": "http://ionicframework.com/",
-  "private": true,
+  "author": "Marcel Hofmann",
+  "private": false,
+  "license": "Apache-2.0",
   "scripts": {
     "clean": "ionic-app-scripts clean",
     "build": "ionic-app-scripts build",
@@ -34,5 +34,5 @@
     "@ionic/app-scripts": "3.1.8",
     "typescript": "2.4.2"
   },
-  "description": "An Ionic project"
+  "description": "A demo for a shipment network on hyperledger."
 }
