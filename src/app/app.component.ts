@@ -8,7 +8,7 @@ import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { ApplicationRef } from '@angular/core';
 
-import { ListPage } from '../pages/list/list';
+import { DetailPage } from '../pages/detail/detail';
 import { dispatchEvent } from '@angular/core/src/view/util';
 
 @Component({

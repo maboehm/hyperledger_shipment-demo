@@ -7,7 +7,7 @@ import { ToastController } from 'ionic-angular';
 import { HttpClient } from "@angular/common/http";
 import { isArray } from 'ionic-angular/util/util';
 
-import { ListPage } from '../list/list';
+import { DetailPage } from '../detail/detail';
 
 
 @Component({
@@ -32,7 +32,7 @@ export class HomePage {
   }
 
   private detailClick(type: string, id: string) {
-    this.navCtrl.push(ListPage, {
+    this.navCtrl.push(DetailPage, {
       type: type,
       id: id
     });
