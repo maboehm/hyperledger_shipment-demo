@@ -111,12 +111,7 @@ export class TransferPage {
   ionViewDidLoad() {
     console.log('ionViewDidLoad TransferPage');
 
-    let openSubscriber = Subscriber.create(() => {
-      console.info("websocket connection opened");
-    });
-
-    let observable = this.webSocket.createObservableSocket(this.url, openSubscriber)
-      .map(message => JSON.parse(message));
+    let observable = this.webSocket.createObservableSocket();
 
     observable.subscribe(
       next => {
@@ -128,8 +123,7 @@ export class TransferPage {
             break;
           default: this.presentToast("New Event: " + next.$class, 3000, null, "top")
         }
-      },
-      error => console.log(error)
+      }
     )
   }
 

@@ -12,5 +12,4 @@ export class Logger {
   public static warn(...msg: any[]) {
     console.warn(...msg);
   }
-
 }
