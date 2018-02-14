@@ -27,7 +27,8 @@ export class HomePage {
     private http: HttpClient,
     private global: GlobalService) {
 
-    this.global.observeShipmentId().subscribe(next => this.shipmentId = next);
+    this.shipmentId = this.global.shipmentId;
+    this.global.observeShipmentId.subscribe(next => this.shipmentId = next);
   }
 
   private detailClick(type: string, id: string) {
@@ -53,7 +54,7 @@ export class HomePage {
 
   private onButtonClick() {
     console.log("button");
-    this.global.setShipmentId(this.shipmentId);
+    this.global.shipmentId = this.shipmentId;
     this.presentToast("Lade Daten", 2000)
     this.updateChainData(this.shipmentId)
   }

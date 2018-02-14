@@ -37,8 +37,10 @@ export class TransferPage {
     public toastCtrl: ToastController,
     public webSocket: WebsocketProvider) {
 
-    this.global.observeId().subscribe(next => this.myID = next);
-    this.global.observeShipmentId().subscribe(next => this.shipmentId = next);
+    this.myID = this.global.id;
+    this.shipmentId = this.global.shipmentId;
+    this.global.observeId.subscribe(next => this.myID = next);
+    this.global.observeShipmentId.subscribe(next => this.shipmentId = next);
   }
 
   private releaseShipment() {
@@ -61,8 +63,8 @@ export class TransferPage {
 
   private isReleasePossible() {
     return this.contract
-    && this.shipmentData.status == "IN_TRANSIT"
-    && this.contract.shippers.includes("resource:org.kit.blockchain.Shipper#" + this.myID);
+      && this.shipmentData.status == "IN_TRANSIT"
+      && this.contract.shippers.includes("resource:org.kit.blockchain.Shipper#" + this.myID);
   }
 
   private overtakeShipment() {
@@ -80,8 +82,8 @@ export class TransferPage {
 
   private isOvertakePossible() {
     return this.contract
-    && this.shipmentData.status == "RELEASED"
-    && !this.contract.shippers.includes("resource:org.kit.blockchain.Shipper#" + this.myID);
+      && this.shipmentData.status == "RELEASED"
+      && !this.contract.shippers.includes("resource:org.kit.blockchain.Shipper#" + this.myID);
   }
 
   private getContract(id: string) {

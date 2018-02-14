@@ -13,10 +13,10 @@ import { Subject } from 'rxjs/Subject';
 @Injectable()
 
 export class GlobalService {
-  private id: string;
-  private shipmentId: string;
+  private _id: string;
+  private _shipmentId: string;
   private idSubject: Subject<string> = new Subject();
-  private shipmentIdSubject: Subject<string>  = new Subject;
+  private shipmentIdSubject: Subject<string> = new Subject;
 
   private ID = "myId";
   private SHIPMENT_ID = "shipmentId";
@@ -24,13 +24,13 @@ export class GlobalService {
   constructor(private storage: Storage) {
     this.storage.get(this.ID).then(id => {
       if (id) {
-        this.id = id;
+        this._id = id;
         this.idSubject.next(id);
       }
     });
     this.storage.get(this.SHIPMENT_ID).then(id => {
       if (id) {
-        this.shipmentId = id;
+        this._shipmentId = id;
         this.shipmentIdSubject.next(id);
       }
     });
@@ -39,34 +39,34 @@ export class GlobalService {
   /*
    * Id getter/setter
    */
-  setId(newValue: string) {
+  set id(newValue: string) {
     this.storage.set(this.ID, newValue);
-    this.id = newValue;
+    this._id = newValue;
     this.idSubject.next(newValue);
   }
 
-  getId(): string {
-    return this.id;
+  get id(): string {
+    return this._id;
   }
 
-  observeId(): Subject<string> {
+  get observeId(): Subject<string> {
     return this.idSubject;
   }
 
   /**
    * shipmentId getter/setter
    */
-  setShipmentId(newValue: string) {
+  set shipmentId(newValue: string) {
     this.storage.set(this.SHIPMENT_ID, newValue);
-    this.shipmentId = newValue;
+    this._shipmentId = newValue;
     this.shipmentIdSubject.next(newValue);
   }
 
-  getShipmentId(): string {
-    return this.shipmentId;
+  get shipmentId(): string {
+    return this._shipmentId;
   }
 
-  observeShipmentId(): Subject<string> {
+  get observeShipmentId(): Subject<string> {
     return this.shipmentIdSubject;
   }
 }
