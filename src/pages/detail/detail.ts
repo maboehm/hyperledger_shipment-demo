@@ -3,7 +3,6 @@ import { BlockchainRest } from './../../providers/blockchain/blockchain-rest';
 import { Component } from '@angular/core';
 import { NavParams } from 'ionic-angular';
 
-
 /**
  * This detail page shows entities from the blockchain as a preformatted block.
  * It expects the navParamgs type and id to build its html request

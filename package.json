@@ -32,7 +32,7 @@
   },
   "devDependencies": {
     "@ionic/app-scripts": "3.1.8",
-    "tslint": "^4.5.1",
+    "tslint": "^5.9.1",
     "typescript": "^2.4.2"
   },
   "description": "A demo for a shipment network on hyperledger."
