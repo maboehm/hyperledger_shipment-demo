@@ -1,9 +1,3 @@
-<!--
-  Generated template for the TransferPage page.
-
-  See http://ionicframework.com/docs/components/#navigation for more info on
-  Ionic pages and navigation.
--->
 <ion-header>
   <ion-navbar>
     <button ion-button menuToggle>
@@ -13,11 +7,10 @@
   </ion-navbar>
 </ion-header>
 
-
 <ion-content padding>
   <ion-card>
     <ion-card-content>
-      <h1>Shipment Details</h1>
+      <h1>Transfer Detail</h1>
       <form>
         <ion-list>
           <ion-item>
@@ -25,7 +18,7 @@
             <ion-input type="text" [(ngModel)]="shipmentId" [ngModelOptions]="{standalone: true}"></ion-input>
           </ion-item>
           <ion-item>
-            <button type="submit" item-end ion-button secondary outline (click)=onButtonClick() icon-start [disabled]="!shipmentId">
+            <button type="submit" item-end ion-button secondary outline (click)=onCheckButtonClick() icon-start [disabled]="!shipmentId">
               <ion-icon name="share-alt"></ion-icon>
               Check Transfer Status
             </button>
@@ -42,7 +35,7 @@
     <ion-card-content text-center>
       <span ion-button outline color="secondary" small>{{shipmentData.status}}</span>
       <br>
-      <form *ngIf="myID && isReleasePossible()">
+      <form *ngIf="myId && isReleasePossible()">
         <ion-item>
           <ion-label color="primary" floating>New Shipper</ion-label>
           <ion-input type="text" [(ngModel)]="new_shipper" [ngModelOptions]="{standalone: true}"></ion-input>
@@ -51,15 +44,15 @@
           <button ion-button type="submit" round outline (click)=releaseShipment()>Release Shipment</button>
         </ion-item>
       </form>
-      <form *ngIf="myID && isOvertakePossible()">
-          <ion-item>
-            <ion-label color="primary" floating>Old Shipper</ion-label>
-            <ion-input type="text" [(ngModel)]="old_shipper" [ngModelOptions]="{standalone: true}"></ion-input>
-          </ion-item>
-          <ion-item>
-            <button ion-button type="submit" round outline (click)=overtakeShipment()>Overtake Shipment</button>
-          </ion-item>
-        </form>
+      <form *ngIf="myId && isOvertakePossible()">
+        <ion-item>
+          <ion-label color="primary" floating>Old Shipper</ion-label>
+          <ion-input type="text" [(ngModel)]="old_shipper" [ngModelOptions]="{standalone: true}"></ion-input>
+        </ion-item>
+        <ion-item>
+          <button ion-button type="submit" round outline (click)=overtakeShipment()>Overtake Shipment</button>
+        </ion-item>
+      </form>
     </ion-card-content>
   </ion-card>
 </ion-content>

@@ -24,6 +24,38 @@ export class BlockchainRest {
    * @memberof BlockchainRest
    */
   public getEntityDetail(type: string, id: string): Observable<any> {
-    return this.http.get(this.url + type + "/" + id);
+    return this.http.get(this.url + type + '/' + id);
+  }
+
+  /**
+   * The current shipper can release a shipment, which is to be overtaken by the next shipper. Calls the
+   * chaincode for ReleaseShipment, which performs checks and sets the status to "RELEASED" if succesfull.
+   * @param shipper_old The shipper responsible for the previous section
+   * @param shipper_new The shipper responsible for the next section
+   * @param shipmentId the shipment id
+   */
+  public releaseShipment(shipper_old: string, shipper_new: string, shipmentId: string): Observable<Object> {
+    let prefix = AppConfig.RESOURCE_NS + 'Shipper#';
+    return this.http.post(this.url + 'ShipmentRelease', {
+      shipper_old: prefix + shipper_old,
+      shipper_new: prefix + shipper_new,
+      shipment: shipmentId,
+    })
+  }
+
+  /**
+   * Can only be called, if the new shipper was not an old shipper.
+   * Overtake ownership and responsibility for the shipment.
+   * @param shipper_old The shipper responsible for the previous section
+   * @param shipper_new The shipper responsible for the next section
+   * @param shipmentId the shipment id
+   */
+  public overtakeShipment(shipper_old: string, shipper_new: string, shipmentId: string): Observable<Object> {
+    let prefix = AppConfig.RESOURCE_NS + 'Shipper#';
+    return this.http.post(this.url + 'ShipmentOvertake', {
+      shipper_old: 'resource:org.kit.blockchain.Shipper#' + shipper_old,
+      shipper_new: 'resource:org.kit.blockchain.Shipper#' + shipper_new,
+      shipment: shipmentId,
+    })
   }
 }

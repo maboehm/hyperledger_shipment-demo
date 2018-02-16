@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
 import { Subscriber } from 'rxjs/Subscriber';
-import { ToastController } from 'ionic-angular';
 import { HttpClient } from "@angular/common/http";
 import { isArray } from 'ionic-angular/util/util';
 
@@ -11,6 +10,7 @@ import { Logger } from '../../providers/logger/logger';
 import { GlobalService } from '../../providers/global/global';
 import { BlockchainRest } from '../../providers/blockchain/blockchain-rest';
 import { WebsocketProvider } from '../../providers/websocket/websocket';
+import { SimpleToast } from './../../providers/simpletoast/simpleToast';
 
 /**
  * Displays a Shipment and the exceptions. When a relevant event occurs (ShipmentExceptions) it updates the view
@@ -30,7 +30,7 @@ export class HomePage {
   constructor(
     private navCtrl: NavController,
     private webSocket: WebsocketProvider,
-    private toastCtrl: ToastController,
+    private simpleToast: SimpleToast,
     private global: GlobalService,
     private blockchain: BlockchainRest) {
 
@@ -46,7 +46,7 @@ export class HomePage {
    */
   private initWebsocket() {
     let observable = this.webSocket.createObservableSocket();
-    let defaultToast = (next) => this.presentToast("New Event: " + next.$class, 3000, null, "top")
+    let defaultToast = (next) => this.simpleToast.present("New Event: " + next.$class, 3000, null, "top")
 
     observable.subscribe(
       next => {
@@ -97,7 +97,7 @@ export class HomePage {
 
   // Presents toast, disables highlight and starts to update the entire chain data
   private onShipmentException(data) {
-    this.presentToast("A new Exception was committed to the Blockchain: '" + data.message + "'", 5000, () => {
+    this.simpleToast.present("A new Exception was committed to the Blockchain: '" + data.message + "'", 5000, () => {
       if (this.shipmentData && this.shipmentData.shipmentExceptions) {
         this.shipmentData.shipmentExceptions.map(a => a.highlight = false);
       }
@@ -119,29 +119,7 @@ export class HomePage {
   // tslint:disable-next-line
   private onShipmentSubmit() {
     this.global.shipmentId = this.shipmentId;
-    this.presentToast("Lade Daten", 2000)
+    this.simpleToast.present("Lade Daten", 2000);
     this.updateChainData(this.shipmentId)
-  }
-
-
-  /**
-   * Presents a ionic toast message given the parameters
-   * @param message - The message to display
-   * @param time - Time in ms to show the message
-   * @param onDismiss - Optional callback for when the message was dismissed, either after the timeout or by the user
-   * @param position - Optional position ("top", "middle", "bottom"), default: "bottom"
-   */
-  private presentToast(message: string, time: number, onDismiss?, position?: string) {
-    let toast = this.toastCtrl.create({
-      message: message,
-      duration: time,
-      position: position ? position : 'bottom',
-      showCloseButton: true,
-      closeButtonText: "OK"
-    });
-    let onDidDismiss = onDismiss ? onDismiss : () => Logger.log('Dismissed toast')
-    toast.onDidDismiss(onDidDismiss)
-
-    toast.present();
   }
 }

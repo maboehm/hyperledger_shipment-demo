@@ -1,20 +1,16 @@
-import { WebsocketProvider } from './../../providers/websocket/websocket';
-import { GlobalService } from './../../providers/global/global';
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, ToastController } from 'ionic-angular';
-import { Subscriber } from 'rxjs/Subscriber';
 
-import { HttpClient } from "@angular/common/http";
+import { HttpClient } from '@angular/common/http';
 import { isArray } from 'ionic-angular/util/util';
 
-/**
- * Generated class for the TransferPage page.
- *
- * See https://ionicframework.com/docs/components/#navigation for more info on
- * Ionic pages and navigation.
- */
+import { WebsocketProvider } from './../../providers/websocket/websocket';
+import { GlobalService } from './../../providers/global/global';
+import { SimpleToast } from './../../providers/simpletoast/simpleToast';
+import { BlockchainRest } from './../../providers/blockchain/blockchain-rest';
+import { Logger } from './../../providers/logger/logger';
+import { AppConfig } from '../../app/app.config';
 
-@IonicPage()
+
 @Component({
   selector: 'page-transfer',
   templateUrl: 'transfer.html',
@@ -23,135 +19,129 @@ export class TransferPage {
   private shipmentId: string;
   private shipmentData: any;
   private contract: any;
-  private myID = "";
-  private new_shipper = "";
-  private old_shipper = "";
-  private url = "ws://kit-blockchain.duckdns.org:31090/"
+  private myId = '';
+  private new_shipper = '';
+  private old_shipper = '';
 
 
   constructor(
-    public navCtrl: NavController,
-    public navParams: NavParams,
-    public http: HttpClient,
-    public global: GlobalService,
-    public toastCtrl: ToastController,
-    public webSocket: WebsocketProvider) {
+    private http: HttpClient,
+    private global: GlobalService,
+    private simpleToast: SimpleToast,
+    private webSocket: WebsocketProvider,
+    private blockchain: BlockchainRest) {
 
-    this.myID = this.global.id;
+    this.myId = this.global.id;
     this.shipmentId = this.global.shipmentId;
-    this.global.observeId.subscribe(next => this.myID = next);
+    this.global.observeId.subscribe(next => this.myId = next);
     this.global.observeShipmentId.subscribe(next => this.shipmentId = next);
+
+    this.initWebsocket();
   }
 
-  private releaseShipment() {
-    this.presentToast("Releasing Shipment", 3000);
-    this.http.post("http://kit-blockchain.duckdns.org:31090/api/ShipmentRelease", {
-      "shipper_old": "resource:org.kit.blockchain.Shipper#" + this.myID,
-      "shipper_new": "resource:org.kit.blockchain.Shipper#" + this.new_shipper,
-      "shipment": this.shipmentId,
-    }).subscribe((data: any) => {
-      console.log(data)
-      this.updateChainData(this.shipmentId);
-      this.new_shipper = "";
-    });
-  }
-
-  private onButtonClick() {
-    this.presentToast("Getting Transfer Status", 3000);
-    this.updateChainData(this.shipmentId);
-  }
-
-  private isReleasePossible() {
-    return this.contract
-      && this.shipmentData.status == "IN_TRANSIT"
-      && this.contract.shippers.includes("resource:org.kit.blockchain.Shipper#" + this.myID);
-  }
-
-  private overtakeShipment() {
-    this.presentToast("Overtaking Shipment", 3000);
-    this.http.post("http://kit-blockchain.duckdns.org:31090/api/ShipmentOvertake", {
-      "shipper_old": "resource:org.kit.blockchain.Shipper#" + this.old_shipper,
-      "shipper_new": "resource:org.kit.blockchain.Shipper#" + this.myID,
-      "shipment": this.shipmentId,
-    }).subscribe((data: any) => {
-      console.log(data)
-      this.old_shipper = "";
-      this.updateChainData(this.shipmentId);
-    });
-  }
-
-  private isOvertakePossible() {
-    return this.contract
-      && this.shipmentData.status == "RELEASED"
-      && !this.contract.shippers.includes("resource:org.kit.blockchain.Shipper#" + this.myID);
-  }
-
+  // Queries the blockchain for the given contract id
   private getContract(id: string) {
-    this.http.get("http://kit-blockchain.duckdns.org:31090/api/Contract/" + id)
+    this.blockchain.getEntityDetail('Contract', id)
       .subscribe((data: any) => {
-        console.log(data);
+        Logger.log(data);
         this.contract = data;
       });
   }
 
-  private updateChainData(shipmentId: String) {
-    this.http.get("http://kit-blockchain.duckdns.org:31090/api/Shipment/" + shipmentId)
+  // Updates the chaindata, of which only a some information is displayed
+  private updateChainData(shipmentId: string) {
+    this.blockchain.getEntityDetail('Shipment', shipmentId)
       .subscribe((data: any) => {
-        console.log("Recieved data", data);
+        Logger.log('Recieved data', data);
         data = isArray(data) ? data[0] : data;
         this.shipmentData = data;
 
-        this.getContract(this.shipmentData.contract.split("#")[1]);
+        this.getContract(this.shipmentData.contract.split('#')[1]);
       },
       error => {
         this.shipmentData = null;
       })
   }
 
-  ionViewDidLoad() {
-    console.log('ionViewDidLoad TransferPage');
-
+  // Initializes the websocket and registers the listeners
+  private initWebsocket() {
     let observable = this.webSocket.createObservableSocket();
 
     observable.subscribe(
       next => {
-        console.log("event", next);
         switch (next.$class) {
-          case "org.kit.blockchain.ShipmentOvertakeEvent": this.onShipmentOvertakeEvent(next);
+          case AppConfig.NS + 'ShipmentOvertakeEvent': this.onShipmentOvertakeEvent(next);
             break;
-          case "org.kit.blockchain.ShipmentReleaseEvent": this.onShipmentReleaseEvent(next)
+          case AppConfig.NS + 'ShipmentReleaseEvent': this.onShipmentReleaseEvent(next)
             break;
-          default: this.presentToast("New Event: " + next.$class, 3000, null, "top")
+          default: this.simpleToast.present('New Event: ' + next.$class, 3000, null, 'top')
         }
       }
     )
   }
 
+  // Shows a simple toast, when a relevant overtake event was received
   private onShipmentOvertakeEvent(event) {
-    console.log("overtake:", event);
-    let longID = "resource:org.kit.blockchain.Shipper#" + this.myID
+    Logger.log('overtake:', event);
+    let longID = AppConfig.RESOURCE_NS + 'Shipper#' + this.myId
     if (event.shipper_new == longID || event.shipper_old == longID) {
-      this.presentToast("An Overtake Event for you for shipment '" + event.shipmentId + "'", 5000, null, "top");
+      this.simpleToast.present('An Overtake Event for you for shipment "' + event.shipmentId + '"', 5000, null, 'top');
     }
   }
+
+  // Simply shows a toast, when a relevant release event occured
   private onShipmentReleaseEvent(event) {
-    if (event.shipper_new.email == this.myID || event.shipper_old.email == this.myID) {
-      this.presentToast("A Release Event for you for shipment '" + event.shipmentId + "'", 5000, null, "top");
+    if (event.shipper_new.email == this.myId || event.shipper_old.email == this.myId) {
+      this.simpleToast.present('A Release Event for you for shipment "' + event.shipmentId + '"', 5000, null, 'top');
     }
   }
 
-  private presentToast(message, time, onDismiss?, position?) {
-    let toast = this.toastCtrl.create({
-      message: message,
-      duration: time,
-      position: position ? position : 'bottom',
-      showCloseButton: true,
-      closeButtonText: "OK"
-    });
-    let onDidDismiss = onDismiss ? onDismiss : () => console.log('Dismissed toast')
-    toast.onDidDismiss(onDidDismiss)
-
-    toast.present();
+  // Executes the releaseShipment Chaincode and updates the view
+  // tslint:disable-next-line:no-unused-variable
+  private releaseShipment() {
+    this.simpleToast.present('Releasing Shipment', 3000);
+    this.blockchain.releaseShipment(this.myId, this.new_shipper, this.shipmentId)
+      .subscribe((data: any) => {
+        Logger.log(data)
+        this.updateChainData(this.shipmentId);
+        this.new_shipper = '';
+      });
   }
 
+  // When the form is submitted the view is updated
+  // tslint:disable-next-line:no-unused-variable
+  private onCheckButtonClick() {
+    this.simpleToast.present('Getting Transfer Status', 3000);
+    this.updateChainData(this.shipmentId);
+  }
+
+  // A release is possible, when the good is 'IN_TRANSIT' and I am the current shipper
+  // tslint:disable-next-line:no-unused-variable
+  private isReleasePossible() {
+    let longId = AppConfig.RESOURCE_NS + 'Shipper#' + this.myId
+    return this.contract
+      && this.shipmentData.status == 'IN_TRANSIT'
+      && this.contract.shippers.includes(longId);
+  }
+
+  // A Overtake is possible, when the status is 'RELEASED' and I am not yet part of the shippers
+  // tslint:disable-next-line:no-unused-variable
+  private isOvertakePossible() {
+    let longId = AppConfig.RESOURCE_NS + 'Shipper#' + this.myId
+    return this.contract
+      && this.shipmentData.status == 'RELEASED'
+      && !this.contract.shippers.includes(longId);
+  }
+
+  // Executes the overtakeShipment Chaincode and updates the view
+  // tslint:disable-next-line:no-unused-variable
+  private overtakeShipment() {
+    this.simpleToast.present('Overtaking Shipment', 3000);
+    this.blockchain.overtakeShipment(this.old_shipper, this.myId, this.shipmentId)
+      .subscribe((data: any) => {
+        Logger.log(data)
+        this.old_shipper = '';
+        this.updateChainData(this.shipmentId);
+      });
+  }
 }

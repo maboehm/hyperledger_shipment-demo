@@ -14,6 +14,7 @@ import localDe from '@angular/common/locales/de';
 
 import { WebsocketProvider } from '../providers/websocket/websocket';
 import { BlockchainRest } from './../providers/blockchain/blockchain-rest';
+import { SimpleToast } from './../providers/simpletoast/simpleToast';
 
 
 import { StatusBar } from '@ionic-native/status-bar';
@@ -52,6 +53,7 @@ registerLocaleData(localDe, 'fr');
     { provide: ErrorHandler, useClass: IonicErrorHandler },
     WebsocketProvider,
     BlockchainRest,
+    SimpleToast,
     GlobalService
   ]
 })
