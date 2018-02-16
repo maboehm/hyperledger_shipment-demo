@@ -1,7 +1,5 @@
 import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
-import { Subscriber } from 'rxjs/Subscriber';
-import { HttpClient } from "@angular/common/http";
 import { isArray } from 'ionic-angular/util/util';
 
 import { DetailPage } from '../detail/detail';

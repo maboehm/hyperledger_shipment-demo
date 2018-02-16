@@ -51,7 +51,6 @@ export class BlockchainRest {
    * @param shipmentId the shipment id
    */
   public overtakeShipment(shipper_old: string, shipper_new: string, shipmentId: string): Observable<Object> {
-    let prefix = AppConfig.RESOURCE_NS + 'Shipper#';
     return this.http.post(this.url + 'ShipmentOvertake', {
       shipper_old: 'resource:org.kit.blockchain.Shipper#' + shipper_old,
       shipper_new: 'resource:org.kit.blockchain.Shipper#' + shipper_new,

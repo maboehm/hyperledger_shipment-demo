@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 
-import { HttpClient } from '@angular/common/http';
 import { isArray } from 'ionic-angular/util/util';
 
 import { WebsocketProvider } from './../../providers/websocket/websocket';
@@ -25,7 +24,6 @@ export class TransferPage {
 
 
   constructor(
-    private http: HttpClient,
     private global: GlobalService,
     private simpleToast: SimpleToast,
     private webSocket: WebsocketProvider,

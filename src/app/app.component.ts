@@ -6,10 +6,6 @@ import { Component, ViewChild } from '@angular/core';
 import { Nav, Platform } from 'ionic-angular';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
-import { ApplicationRef } from '@angular/core';
-
-import { DetailPage } from '../pages/detail/detail';
-import { dispatchEvent } from '@angular/core/src/view/util';
 
 @Component({
   templateUrl: 'app.html'
@@ -17,14 +13,21 @@ import { dispatchEvent } from '@angular/core/src/view/util';
 export class MyApp {
   @ViewChild(Nav) nav: Nav;
 
-  rootPage: any = TransferPage;
+  rootPage: any = HomePage;
 
   pages: Array<{ title: string, component: any, icon: string }>;
   verifiedId = false;
   myId: string;
 
-  constructor(public platform: Platform, public statusBar: StatusBar, public splashScreen: SplashScreen,
-    public global: GlobalService, public ref: ApplicationRef) {
+  constructor(
+    private platform: Platform,
+    private statusBar: StatusBar,
+    private splashScreen: SplashScreen,
+    private global: GlobalService) {
+
+
+    this.myId = this.global.id;
+    this.global.observeId.subscribe(next => this.myId = next);
 
     // used for an example of ngFor and navigation
     this.pages = [
@@ -34,16 +37,8 @@ export class MyApp {
     ];
 
   }
-  private ionViewDidLoad() {
-    console.log("did load");
-  }
 
-  private menuOpened() {
-    console.log("menu opened");
-    this.myId = this.global.id;
-    this.ref.tick();
-  }
-
+  // tslint:disable-next-line:no-unused-variable
   private idChanged(event) {
     this.global.id = this.myId;
   }

@@ -1,7 +1,7 @@
 import { AppConfig } from './../../app/app.config';
 import { Logger } from './../logger/logger';
 import { Injectable } from '@angular/core';
-import { Observable, Subscriber } from 'rxjs/Rx';
+import { Observable } from 'rxjs/Rx';
 
 @Injectable()
 export class WebsocketProvider {

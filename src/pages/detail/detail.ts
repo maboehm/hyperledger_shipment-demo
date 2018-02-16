@@ -1,8 +1,8 @@
 import { Logger } from './../../providers/logger/logger';
 import { BlockchainRest } from './../../providers/blockchain/blockchain-rest';
 import { Component } from '@angular/core';
-import { NavController, NavParams } from 'ionic-angular';
-import { HttpClient } from "@angular/common/http";
+import { NavParams } from 'ionic-angular';
+
 
 /**
  * This detail page shows entities from the blockchain as a preformatted block.
@@ -21,13 +21,12 @@ export class DetailPage {
   id: string;
   data: any = "loading";
 
-  constructor(private navCtrl: NavController,
-    private navParams: NavParams,
+  constructor(private navParams: NavParams,
     private blockchain: BlockchainRest) {
 
     // If we navigated to this page, we will have an item available as a nav param
-    this.type = navParams.get('type');
-    this.id = navParams.get('id');
+    this.type = this.navParams.get('type');
+    this.id = this.navParams.get('id');
     Logger.log(this.type, this.id);
 
     this.blockchain.getEntityDetail(this.type, this.id)
