@@ -23,7 +23,7 @@
             <ion-input type="text" [(ngModel)]="shipmentId" [ngModelOptions]="{standalone: true}"></ion-input>
           </ion-item>
           <ion-item>
-            <button type="submit" item-end ion-button secondary outline (click)=onButtonClick() icon-start [disabled]="!shipmentId">
+            <button type="submit" item-end ion-button secondary outline (click)=onShipmentSubmit() icon-start [disabled]="!shipmentId">
               <ion-icon name="md-send"></ion-icon>
               Check Shiptment Status
             </button>

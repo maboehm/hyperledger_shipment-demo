@@ -1,21 +1,26 @@
+import { MyApp } from './app.component';
+
+import { HomePage } from '../pages/home/home';
 import { GlobalService } from './../providers/global/global';
 import { TransferPage } from './../pages/transfer/transfer';
-import { ListPage } from './../pages/list/list';
+import { DetailPage } from './../pages/detail/detail';
 import { InfoPage } from './../pages/info/info';
+
 import { BrowserModule } from '@angular/platform-browser';
 import { ErrorHandler, NgModule } from '@angular/core';
 import { IonicApp, IonicErrorHandler, IonicModule } from 'ionic-angular';
+import { registerLocaleData } from '@angular/common';
+import localDe from '@angular/common/locales/de';
 
-import { MyApp } from './app.component';
-import { HomePage } from '../pages/home/home';
 import { WebsocketProvider } from '../providers/websocket/websocket';
+import { BlockchainRest } from './../providers/blockchain/blockchain-rest';
+import { SimpleToast } from './../providers/simpletoast/simpleToast';
+
 
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
-import {HttpClientModule} from "@angular/common/http";
-import {IonicStorageModule} from "@ionic/storage";
-import { registerLocaleData } from '@angular/common';
-import localDe from '@angular/common/locales/de';
+import { HttpClientModule } from "@angular/common/http";
+import { IonicStorageModule } from "@ionic/storage";
 
 // the second parameter 'fr' is optional
 registerLocaleData(localDe, 'fr');
@@ -25,7 +30,7 @@ registerLocaleData(localDe, 'fr');
     MyApp,
     HomePage,
     InfoPage,
-    ListPage,
+    DetailPage,
     TransferPage
   ],
   imports: [
@@ -39,15 +44,17 @@ registerLocaleData(localDe, 'fr');
     MyApp,
     HomePage,
     InfoPage,
-    ListPage,
+    DetailPage,
     TransferPage
   ],
   providers: [
     StatusBar,
     SplashScreen,
-    {provide: ErrorHandler, useClass: IonicErrorHandler},
+    { provide: ErrorHandler, useClass: IonicErrorHandler },
     WebsocketProvider,
+    BlockchainRest,
+    SimpleToast,
     GlobalService
   ]
 })
-export class AppModule {}
+export class AppModule { }

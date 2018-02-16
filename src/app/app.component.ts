@@ -8,7 +8,7 @@ import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { ApplicationRef } from '@angular/core';
 
-import { ListPage } from '../pages/list/list';
+import { DetailPage } from '../pages/detail/detail';
 import { dispatchEvent } from '@angular/core/src/view/util';
 
 @Component({
@@ -19,33 +19,33 @@ export class MyApp {
 
   rootPage: any = TransferPage;
 
-  pages: Array<{title: string, component: any, icon: string}>;
+  pages: Array<{ title: string, component: any, icon: string }>;
   verifiedId = false;
-  myId : string;
+  myId: string;
 
   constructor(public platform: Platform, public statusBar: StatusBar, public splashScreen: SplashScreen,
-  public global: GlobalService, public ref: ApplicationRef) {
+    public global: GlobalService, public ref: ApplicationRef) {
 
     // used for an example of ngFor and navigation
     this.pages = [
-      { title: 'Shipment Status', component: HomePage, icon: "cube"},
-      { title: 'Transfer', component: TransferPage, icon: "share-alt"},
+      { title: 'Shipment Status', component: HomePage, icon: "cube" },
+      { title: 'Transfer', component: TransferPage, icon: "share-alt" },
       { title: 'Info', component: InfoPage, icon: "information-circle" }
     ];
 
   }
   private ionViewDidLoad() {
-   console.log("did load");
+    console.log("did load");
   }
 
   private menuOpened() {
     console.log("menu opened");
-    this.myId = this.global.getId();
+    this.myId = this.global.id;
     this.ref.tick();
   }
 
   private idChanged(event) {
-    this.global.setId(this.myId);
+    this.global.id = this.myId;
   }
 
   initializeApp() {
